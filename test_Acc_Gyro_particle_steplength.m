@@ -123,8 +123,21 @@ n = 1000;
 % ps.y = data1.y(rand_idx);
 
 % 3. initial area
-ps.x = 24+random('normal',0,.5,[n,1]);
-ps.y = 11+random('normal',0,.5,[n,1]);
+init = [24,11;68,11];
+for i=1:size(init,1)
+    % [ps.x, ps.y] = deal(init + [random('normal',0,.5,[n,1]),random('normal',0,.5,[n,1])]);
+    m = fix(n/size(init,1));
+    if ~exist('ps','var')
+        ps.x = init(i,1)+random('normal',0,.5,[m,1]);
+        ps.y = init(i,2)+random('normal',0,.5,[m,1]);        
+    else
+        if i == size(init,1)
+            m = m+mod(n,size(init,1));
+        end
+        ps.x = [ps.x;init(i,1)+random('normal',0,.5,[m,1])];
+        ps.y = [ps.y;init(i,2)+random('normal',0,.5,[m,1])]; 
+    end    
+end
 ps.hist_x = ps.x;
 ps.hist_y = ps.y;
 ps.sl = .6+random('normal',0,.01,[n,1]);
@@ -136,10 +149,9 @@ h_ps = scatter(ps.x,ps.y,20,'g','filled','MarkerFaceAlpha',.2);
 h_pm = plot(mean(ps.x),mean(ps.y),'ms');
 legend('reference point','particle','mean')
 hold off
-hold off
 
 %%
-video_flag = 1;
+video_flag = 0;
 if video_flag
 %     v = VideoWriter('vids/pdr_particle_labeling_.mp4','MPEG-4');
     v = VideoWriter('vids/pf_labeling_sl_0.01.avi','Motion JPEG AVI');
@@ -162,8 +174,9 @@ for i=1:length(locs)
     ps.y = ps.y + ps.sl.*sin(ps.init_heading+deg2rad(yaw));
     % UPDATE
     [physical_d,I] = pdist2([area_x,area_y],[ps.x,ps.y],'euclidean','Smallest',1);
-    ps.prob = 1./physical_d;
-    ps.prob(physical_d>.5) = 0;
+%     ps.prob = 1./physical_d;
+    ps.prob = physical_d<=.8;
+    ps.prob(physical_d>.8) = 0;
     
     % RESAMPLE
     % When re-distribute particles
@@ -197,7 +210,7 @@ end
 if video_flag  
     close(v);
 end
-% return
+return
 %%
 % close all
 figure
