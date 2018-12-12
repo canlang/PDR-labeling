@@ -1,0 +1,59 @@
+#VRML V2.0 utf8
+
+DEF cellulare Transform {
+  scaleOrientation 0 0 0 0
+  rotation 0 0 0 0
+  children [
+    Shape {
+      appearance Appearance {
+        textureTransform TextureTransform {
+        }
+        material Material {
+          diffuseColor 0.2 0.2 1
+          ambientIntensity 0.5
+        }
+      }
+      geometry Box {
+        size 2.4 5 0.3
+      }
+    }
+    Transform {
+      translation 0 0.3 0.1501
+      children Shape {
+        appearance Appearance {
+          material Material {
+          }
+        }
+        geometry Box {
+          size 2.1 3.8 0.001
+        }
+      }
+    }
+    Transform {
+      translation -0.6 2 -0.151
+      rotation 1 0 0 1.5708
+      children Shape {
+        appearance Appearance {
+          material Material {
+          }
+        }
+        geometry Cone {
+          height 0
+          bottomRadius 0.2
+        }
+      }
+    }
+    Transform {
+      translation 0 -2.05 0.1501
+      children Shape {
+        appearance Appearance {
+          material Material {
+          }
+        }
+        geometry Box {
+          size 0.6 0.2 0.001
+        }
+      }
+    }
+  ]
+}

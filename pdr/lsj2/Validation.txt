@@ -1,0 +1,15 @@
+Battery Log	1
+Gps Log	0
+Wifi Log	0
+AP List	0
+Event Log	4
+Place Log	0
+State Log	0
+Satellites Log	0
+Acceleration Log	1191
+AngleSpeed Log	108
+Direction Log	69
+Temperature	0
+AirPressure Log	0
+Light Log	0
+Magnetic Log	143
