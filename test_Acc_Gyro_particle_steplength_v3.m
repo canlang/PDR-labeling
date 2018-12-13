@@ -52,11 +52,6 @@ for i = 1:length(layout.out)
     oy = layout.out{i}(:,2);
     shp = subtract(shp,polyshape(ox,oy));
 end
-%% output form test
-% layout.in = inbound;
-% layout.out = [outbound,outbound2,outbound3];
-% savejson('',layout,'ArrayIndent',0,'FloatFormat','\t%.5g','FileName','test.json')
-
 %%
 % initialize particle
 n = 1000;
