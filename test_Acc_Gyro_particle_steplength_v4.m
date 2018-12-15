@@ -1,4 +1,8 @@
 clear;close all;clc;
+%% load raw IMU data
+target_rawdata_paths = getNameFolds('input_rawdata');
+for j=1:length(target_rawdata_paths)
+rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
 %% load image map
 pixelpermeter = 7.5;    % N1 7F_2.png
 % pixelpermeter = 27.5862;    % huawei_3rd-floor (0.03625)
@@ -27,9 +31,6 @@ for i = 1:length(layout.out)
     oy = layout.out{i}(:,2);
     shp = subtract(shp,polyshape(ox,oy));
 end
-%% load raw IMU data
-target_rawdata_paths = getNameFolds('input_rawdata');
-rawdata = load_rawdata(target_rawdata_paths{3});
 %% resample
 rate = 2e-2;
 processed_data = resample_rawdata(rawdata,rate);
@@ -184,14 +185,17 @@ hold off
 trace_rs = [[processed_data.Time(1);processed_data.Time(locs)],...
     ps.hist_x(k_idx,:)',ps.hist_y(k_idx,:)'];
 % file write
-dlmwrite(fullfile('input_rawdata',strcat(target_rawdata_paths{3},'.csv')),trace_rs,'precision', '%8.2f');
+dlmwrite(fullfile('input_rawdata',strcat(target_rawdata_paths{j},'.csv')),trace_rs,'precision', '%8.2f');
 
 set(gcf,'units','points','position',[1000,200,1500,1200])
 sdf(gcf,'sj2')
 tightfig(gcf);
 
 print -clipboard -dbitmap
-
+print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
+% ,'-r300')
+close all,clearvars -except target_rawdata_paths
+end
 %% local functions
 function data = load_rawdata(datapath)
 acc = csvread(fullfile(datapath,'Accelerometer.csv'),1,0);
