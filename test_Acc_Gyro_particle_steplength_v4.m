@@ -196,18 +196,6 @@ print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
 % ,'-r300')
 close all,clearvars -except target_rawdata_paths
 end
-%% local functions
-function data = load_rawdata(datapath)
-acc = csvread(fullfile(datapath,'Accelerometer.csv'),1,0);
-gyr = csvread(fullfile(datapath,'Gyroscope.csv'),1,0);
-data.acc = acc;
-data.gyr = gyr;
-data.acc_time = datetime(acc(:,1)/10^3,'convertfrom','posixtime','TimeZone','Asia/Seoul');
-data.gyr_time = datetime(gyr(:,1)/10^3,'convertfrom','posixtime','TimeZone','Asia/Seoul');
-
-data.acc_norm = vecnorm(acc(:,3:5),2,2);
-data.acc_norm = data.acc_norm - mean(data.acc_norm);
-end
 
 function data = resample_rawdata(rawdata,rate)
 % TT = synchronize(T_acc,T_gyr,'intersection','linear','SampleRate',50);
@@ -232,13 +220,4 @@ data.acc_norm = TT.acc_norm;
 data.Time = seconds(TT.Time(:));
 % data.Time = seconds(TT.Time(:)-(TT.Time(1)));
 data.Rate = median(diff(data.Time)); % cal sample rate
-end
-
-function nameFolds = getNameFolds(pathFolder)
-% pathFolder = 'input_rawdata';
-d = dir(pathFolder);
-isub = [d(:).isdir]; %# returns logical vector
-nameFolds = {d(isub).name}';
-
-nameFolds(ismember(nameFolds,{'.','..'})) = [];
 end

@@ -1,15 +1,14 @@
 clear;close all;clc;
 
-addpath('input_rawdata')
-raw_acc = csvread('Accelerometer.csv',1,0);
-raw_gyr = csvread('Gyroscope.csv',1,0);
+target_rawdata_paths = getNameFolds('input_rawdata');
+j = 1;
+rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
 
-acc_time = datetime(raw_acc(:,1)/10^3,'convertfrom','posixtime','TimeZone','Asia/Seoul');
-gyr_time = datetime(raw_gyr(:,1)/10^3,'convertfrom','posixtime','TimeZone','Asia/Seoul');
-
-acc_mag = vecnorm(raw_acc(:,3:5),2,2);
-acc_mag = acc_mag - mean(acc_mag);
-
+raw_acc = rawdata.acc;
+raw_gyr = rawdata.gyr;
+acc_time = rawdata.acc_time;
+gyr_time = rawdata.gyr_time;
+acc_mag = rawdata.acc_norm;
 %% resample
 T_acc = timetable(seconds(raw_acc(:,2)/1e9),raw_acc(:,3:5),acc_mag);
 T_gyr = timetable(seconds(raw_gyr(:,2)/1e9),raw_gyr(:,3:5));
@@ -75,6 +74,11 @@ for i=1:length(locs)
 end
 %%
 figure
+subplot(311)
+plot(acc_time, raw_acc(:,3:5))
+subplot(312)
+plot(gyr_time, raw_gyr(:,3:5))
+subplot(313)
 plot(estloc(:,1),estloc(:,2),'xr-','MarkerSize',8)
 % ylim([-10 50])
 axis image
