@@ -31,7 +31,7 @@ for i = 1:length(layout.out)
     oy = layout.out{i}(:,2);
     shp = subtract(shp,polyshape(ox,oy));
 end
-%% resample
+%% resample 
 rate = 2e-2;
 processed_data = resample_rawdata(rawdata,rate);
 %% find step point (step) and time labeling
