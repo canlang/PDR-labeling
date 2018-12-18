@@ -66,6 +66,7 @@ n = 1000;
 % init_point = [mean([148.2,143.4]),50.26];
 % ps.x = init_point(1)+random('normal',0,.5,[n,1]);
 % ps.y = init_point(2)+random('normal',0,.5,[n,1]);
+
 init = [mean([42.6,44.65]),mean([14.49,18.22]);mean([89.2,91.38]),mean([14.49,18.22])];
 for i=1:size(init,1)
     % [ps.x, ps.y] = deal(init + [random('normal',0,.5,[n,1]),random('normal',0,.5,[n,1])]);
