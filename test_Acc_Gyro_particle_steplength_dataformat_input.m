@@ -172,6 +172,7 @@ end
 subplot(212)
 imshow(flipud(I),RA);
 axis xy;
+
 % reference : end point info.
 % end_point = [12.8,23.98];
 % end_point = [74,20]; %N1-7F(new)
@@ -182,6 +183,7 @@ elseif strcmp(trace_info{2},'ESCAL')
 else
     end_point = layout.stair;
 end
+
 % find best path
 [k_idx,k_d] = knnsearch([ps.hist_x(:,end),ps.hist_y(:,end)],end_point,'k',1);
 sorted_k = sortrows([k_idx,k_d],2);
@@ -190,6 +192,7 @@ sorted_k(1)
 % visusalize result
 hold on
 plot(ps.hist_x(sorted_k(1),:),ps.hist_y(sorted_k(1),:));
+text(1,3,['Weight = ',num2str(min(k_d))]);
 hold off
 
 % first time is initial time and it must be added manually,
@@ -197,18 +200,20 @@ hold off
 trace_rs = [[processed_data.Time(1);processed_data.Time(locs)],...
     ps.hist_x(sorted_k(1),:)',ps.hist_y(sorted_k(1),:)'];
 % file write
-dlmwrite(fullfile('input_rawdata',strcat(target_rawdata_paths{j},'.csv')),trace_rs,'precision', '%8.2f');
+dlmwrite(fullfile('input_rawdata',...
+    strcat([target_rawdata_paths{j},'_',num2str(min(k_d),'%.1f'),'.csv'])),...
+    trace_rs,'precision', '%8.2f');
 
 set(gcf,'units','points','position',[1000,200,1500,1200])
 sdf(gcf,'sj2')
 tightfig(gcf);
 
-print -clipboard -dbitmap
+% print -clipboard -dbitmap
 print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
 % ,'-r300')
 
 % -- CLEAR ALL VARIABLES FOR ITERATIVE LOOP
-% close all,clearvars -except target_rawdata_paths
+close all,clearvars -except target_rawdata_paths
 end
 
 %% local function -----------------------------------------------------------------
@@ -219,7 +224,6 @@ isub = [d(:).isdir]; %# returns logical vector
 nameFolds = {d(isub).name}';
 
 nameFolds(ismember(nameFolds,{'.','..'})) = [];
-% disp(regexp(nameFolds, '\d*.*')))
 nameFolds(~cellfun(@isempty,regexp(nameFolds, '\d{6}'))) = [];
 end
 function data = resample_rawdata(rawdata,rate)

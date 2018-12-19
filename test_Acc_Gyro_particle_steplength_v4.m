@@ -6,7 +6,7 @@ rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
 %% load image map
 pixelpermeter = 7.5;    % N1 7F_2.png
 % pixelpermeter = 27.5862;    % huawei_3rd-floor (0.03625)
-[I,I_map,I_alpha] = imread('N1-7F_3.png','BackgroundColor',[1 1 1]);
+[I,I_map,I_alpha] = imread('N1-7F.png','BackgroundColor',[1 1 1]);
 % [I,I_map,I_alpha] = imread('N1-7F_3.png');
 [I_h,I_w,I_as] = size(I);
 % A = imread('huawei_3rd-floor_gray_extended.png','BackgroundColor',[1 1 1]);
