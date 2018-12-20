@@ -55,7 +55,6 @@ end
 
 euler = quatern2euler(quaternConj(quaternion)) * (180/pi);	% use conjugate for sensor frame relative to Earth and convert to degrees.
 
-
 %%
 % initialize particle
 n = 1000;

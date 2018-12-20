@@ -1,8 +1,19 @@
 clear;close all;clc;
-%% load raw IMU data
+%% load raw (IMU) data
 target_rawdata_paths = getNameFolds('input_rawdata');
 for j=1:length(target_rawdata_paths)
 rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
+%% inbound & outbound
+layout = loadjson('N1-7F.json');
+
+x = layout.in(:,1);
+y = layout.in(:,2);
+shp = polyshape(x,y);
+for i = 1:length(layout.out)
+    ox = layout.out{i}(:,1);
+    oy = layout.out{i}(:,2);
+    shp = subtract(shp,polyshape(ox,oy));
+end
 %% load image map
 pixelpermeter = 7.5;    % N1 7F_2.png
 % pixelpermeter = 27.5862;    % huawei_3rd-floor (0.03625)
@@ -20,18 +31,8 @@ axis xy;
 % for save eps
 set(gcf,'units','points','position',[200,200,1200,600])
 sdf(gcf,'sj2')
-%% inbound & outbound
-layout = loadjson('N1-7F.json');
 
-x = layout.in(:,1);
-y = layout.in(:,2);
-shp = polyshape(x,y);
-for i = 1:length(layout.out)
-    ox = layout.out{i}(:,1);
-    oy = layout.out{i}(:,2);
-    shp = subtract(shp,polyshape(ox,oy));
-end
-%% resample 
+%% resample for synchronize
 rate = 2e-2;
 processed_data = resample_rawdata(rawdata,rate);
 %% find step point (step) and time labeling
@@ -52,8 +53,8 @@ for t = 1:length(processed_data.Time)
 end
 
 euler = quatern2euler(quaternConj(quaternion)) * (180/pi);	% use conjugate for sensor frame relative to Earth and convert to degrees.
-
-
+std_euler = stdfilt(deg2rad(unwrap(euler(:,3))));
+% plot(processed_data.Time, std_euler)
 %%
 % initialize particle
 n = 1000;
@@ -146,6 +147,7 @@ for i=1:length(locs)
     ps.hist_y = ps.hist_y(resample_idx,:);
 %     ps.init_heading = ps.init_heading(resample_idx)+random('normal',0,.01,[n,1]);
     ps.init_heading = ps.init_heading(resample_idx)+random('normal',0,.1,[n,1]);
+%     ps.init_heading = ps.init_heading(resample_idx)+random('normal',0,std_euler(time_i),[n,1]);
     set(h_ps,'XData',ps.x,'YData',ps.y)                             % ps result
     set(h_pm,'XData',mean(ps.x),'YData',mean(ps.y));    
     drawnow
@@ -175,10 +177,13 @@ axis xy;
 % end_point = [12.8,23.98];
 end_point = [74,20];
 % find best path
-k_idx = knnsearch([ps.hist_x(:,end),ps.hist_y(:,end)],end_point,'k',1);
+[k_idx,k_d] = knnsearch([ps.hist_x(:,end),ps.hist_y(:,end)],end_point,'k',1);
+sorted_k = sortrows([k_idx,k_d],2);
+sorted_k(1)
 % visusalize result
 hold on
 plot(ps.hist_x(k_idx,:),ps.hist_y(k_idx,:));
+text(1,3,['Weight = ',num2str(1/min(k_d))]);
 hold off
 
 % first time is initial time and it must be added manually,

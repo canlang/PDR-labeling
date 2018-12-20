@@ -1,11 +1,12 @@
 clear;close all;clc;
 
-% target_rawdata_paths = getNameFolds('input_rawdata');
-% j = find(strcmp(target_rawdata_paths, '181214_202554_144_A_SuminAhn_Mate20Pro_3'));
-% rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
+target_rawdata_paths = getNameFolds('input_rawdata');
+j = find(strcmp(target_rawdata_paths, '181214_202554_144_A_SuminAhn_Mate20Pro_3'));
+rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
 
 % rawdata = load_rawdata('181217_170914_656_N1_긴복도_동쪽방향');
-rawdata = load_rawdata('181217_171014_406_N1_긴복도_서쪽방향');
+% rawdata = load_rawdata('181217_171014_406_N1_긴복도_서쪽방향');
+
 
 raw_acc = rawdata.acc;
 raw_gyr = rawdata.gyr;
@@ -83,9 +84,13 @@ plot(acc_time, raw_acc(:,3:5))
 
 subplot(321)
 yaw = unwrap((euler(:,3)));
-plot(time, yaw)
+s_yaw = smoothdata(yaw,'movmedian',0);
+plot(time, deg2rad(yaw))
+% xlabel('time');ylabel('yaw')
+title('time to yaw (rad)')
 subplot(323)
-plot(time, stdfilt(yaw))
+plot(time, stdfilt(deg2rad(yaw)))
+title('time to std (yaw)')
 % plot((euler(:,3)))
 
 subplot(3, 2, 2:2:6)
