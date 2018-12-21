@@ -1,5 +1,5 @@
 clear;close all;clc;
-%% load raw data
+%% load raw data (from IMU)
 target_rawdata_paths = getNameFolds('input_rawdata');
 %%
 for j=1:length(target_rawdata_paths)
@@ -20,7 +20,11 @@ end
 
 %% load image map
 pixelpermeter = layout.ppm; 
-[I,I_map,I_alpha] = imread(strcat([trace_info{3},'.png']),'BackgroundColor',[1 1 1]);
+if isfile(strcat([trace_info{3},'.png']))
+    [I,I_map,I_alpha] = imread(strcat([trace_info{3},'.png']),'BackgroundColor',[1 1 1]);
+else
+    [I,I_map,I_alpha] = imread(strcat([trace_info{3},'.jpg']));
+end
 [I_h,I_w,I_as] = size(I);
 xWorldLimits = [0 I_w/pixelpermeter];
 yWorldLimits = [0 I_h/pixelpermeter];
@@ -176,7 +180,7 @@ sorted_k(1)
 % visusalize result
 hold on
 plot(ps.hist_x(sorted_k(1),:),ps.hist_y(sorted_k(1),:));
-text(1,3,['Weight = ',num2str(1/min(k_d))]);
+text(1,3,['Penalty Score = ',num2str(min(k_d))]);
 hold off
 
 % first time is initial time and it must be added manually,
@@ -202,13 +206,11 @@ end
 
 %% local function -----------------------------------------------------------------
 function nameFolds = getNameFolds(pathFolder)
-% pathFolder = 'input_rawdata';
 d = dir(pathFolder);
 isub = [d(:).isdir]; %# returns logical vector
 nameFolds = {d(isub).name}';
-
 nameFolds(ismember(nameFolds,{'.','..'})) = [];
-nameFolds(~cellfun(@isempty,regexp(nameFolds, '\d{6}'))) = [];
+% nameFolds(~cellfun(@isempty,regexp(nameFolds, '\d{6}'))) = [];
 end
 function data = resample_rawdata(rawdata,rate)
 % Var1 : 3 vectors of Accelerometer, Var2: norm vector of Acc.
