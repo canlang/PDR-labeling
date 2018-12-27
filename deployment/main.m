@@ -21,7 +21,8 @@ end
 %% load image map
 pixelpermeter = layout.ppm; 
 if isfile(strcat([trace_info{3},'.png']))
-    [I,I_map,I_alpha] = imread(strcat([trace_info{3},'.png']),'BackgroundColor',[1 1 1]);
+%     [I,I_map,I_alpha] = imread(strcat([trace_info{3},'.png']),'BackgroundColor',[1 1 1]);
+    I = imread(strcat([trace_info{3},'.png']),'BackgroundColor',[1 1 1]);
 else
     [I,I_map,I_alpha] = imread(strcat([trace_info{3},'.jpg']));
 end
@@ -29,7 +30,9 @@ end
 xWorldLimits = [0 I_w/pixelpermeter];
 yWorldLimits = [0 I_h/pixelpermeter];
 RA = imref2d(size(I),xWorldLimits,yWorldLimits);
-imshow(flipud(I),RA);
+% imshow(flipud(I),RA);
+imshow(flipud(I),RA,'InitialMagnification', 'fit');
+% h = imshow(flipud(I),RA,'Colormap',I_map);
 axis xy;
 set(gcf,'units','points','position',[200,200,1200,600])
 sdf(gcf,'sj2')
@@ -117,6 +120,7 @@ for i=1:length(locs)
     in = isinterior(shp,ps.x,ps.y);
     ps.prob(in) = 1;
     ps.prob(~in) = 0;
+    ps.prob(ps.sl<.4) = 0;
     
     % resampling
     if sum(ps.prob) == 0
@@ -197,7 +201,9 @@ sdf(gcf,'sj2')
 tightfig(gcf);
 
 % print -clipboard -dbitmap
-print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
+% print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
+print(fullfile('input_rawdata',...
+    strcat([target_rawdata_paths{j},'_',num2str(min(k_d),'%.1f'),'.png'])),'-dpng')
 % ,'-r300')
 
 % -- CLEAR ALL VARIABLES FOR ITERATIVE LOOP
