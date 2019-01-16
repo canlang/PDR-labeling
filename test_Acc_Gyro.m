@@ -84,7 +84,7 @@ plot(acc_time, raw_acc(:,3:5))
 
 subplot(321)
 yaw = unwrap((euler(:,3)));
-s_yaw = smoothdata(yaw,'movmedian',0);
+% s_yaw = smoothdata(yaw,'movmedian',0);
 plot(time, deg2rad(yaw))
 % xlabel('time');ylabel('yaw')
 title('time to yaw (rad)')
