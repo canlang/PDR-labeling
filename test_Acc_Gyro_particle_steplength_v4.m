@@ -4,7 +4,7 @@ target_rawdata_paths = getNameFolds('input_rawdata');
 for j=1:length(target_rawdata_paths)
 rawdata = load_rawdata(fullfile('input_rawdata',target_rawdata_paths{j}));
 %% inbound & outbound
-layout = loadjson('N1-7F.json');
+layout = loadjson('N1-7F-HiRes2.json');
 
 x = layout.in(:,1);
 y = layout.in(:,2);
@@ -14,21 +14,41 @@ for i = 1:length(layout.out)
     oy = layout.out{i}(:,2);
     shp = subtract(shp,polyshape(ox,oy));
 end
+%% reference (landmark)
+
+% init = [mean([42.6,44.65]),mean([14.49,18.22]);mean([89.2,91.38]),mean([14.49,18.22])]; % for small N1 map
+init = [mean([23.05,25.14]),mean([9.6,12.32]);mean([67.56,69.8]),mean([11.05,9.56])]; % for highres N1 map
+
+% reference : end point info.
+% end_point = [12.8,23.98];
+% end_point = [74,20];
+end_point = [mean([42.29,51.23]),mean([12.24,17.09])];
+
+
 %% load image map
-pixelpermeter = 7.5;    % N1 7F_2.png
-% pixelpermeter = 27.5862;    % huawei_3rd-floor (0.03625)
+% pixelpermeter = 7.5;    % N1 7F_2.png
+pixelpermeter = 20;    % N1 7F_2.png
+
 [I,I_map,I_alpha] = imread('N1-7F.png','BackgroundColor',[1 1 1]);
+A = imread('N1-7F.png','BackgroundColor',[1 1 1]);
 % [I,I_map,I_alpha] = imread('N1-7F_3.png');
 [I_h,I_w,I_as] = size(I);
+
+% pixelpermeter = 27.5862;    % huawei_3rd-floor (0.03625)
 % A = imread('huawei_3rd-floor_gray_extended.png','BackgroundColor',[1 1 1]);
-xWorldLimits = [0 I_w/pixelpermeter];
-yWorldLimits = [0 I_h/pixelpermeter];
+% xWorldLimits = [0 I_w/pixelpermeter];
+% yWorldLimits = [0 I_h/pixelpermeter];
+
+xWorldLimits = [-1 1650/pixelpermeter]; % * N1 map not matcing the limit *
+yWorldLimits = [-1 660/pixelpermeter];
+
 RA = imref2d(size(I),xWorldLimits,yWorldLimits);
 % imshow(flipud(I),RA,'InitialMagnification', 'fit','Colormap',I_map);
 imshow(flipud(I),RA);
 % h = imshow(flipud(I),RA,'Colormap',I_map);
 axis xy;
 % for save eps
+
 set(gcf,'units','points','position',[200,200,1200,600])
 sdf(gcf,'sj2')
 
@@ -68,7 +88,7 @@ n = 1000;
 % ps.x = init_point(1)+random('normal',0,.5,[n,1]);
 % ps.y = init_point(2)+random('normal',0,.5,[n,1]);
 
-init = [mean([42.6,44.65]),mean([14.49,18.22]);mean([89.2,91.38]),mean([14.49,18.22])];
+% depends on number of init (matrix's row)
 for i=1:size(init,1)
     % [ps.x, ps.y] = deal(init + [random('normal',0,.5,[n,1]),random('normal',0,.5,[n,1])]);
     m = fix(n/size(init,1));
@@ -173,9 +193,8 @@ end
 subplot(212)
 imshow(flipud(I),RA);
 axis xy;
-% reference : end point info.
-% end_point = [12.8,23.98];
-end_point = [74,20];
+
+
 % find best path
 [k_idx,k_d] = knnsearch([ps.hist_x(:,end),ps.hist_y(:,end)],end_point,'k',1);
 sorted_k = sortrows([k_idx,k_d],2);
@@ -198,6 +217,7 @@ sdf(gcf,'sj2')
 tightfig(gcf);
 
 print -clipboard -dbitmap
+% save result image
 print(fullfile('input_rawdata',target_rawdata_paths{j}),'-dpng')
 % ,'-r300')
 close all,clearvars -except target_rawdata_paths

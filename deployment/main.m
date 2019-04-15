@@ -163,9 +163,9 @@ for i=1:length(locs)
     hold on
     plot(ps.hist_x(i,:),ps.hist_y(i,:))
 end
-subplot(212)
-imshow(flipud(I),RA);
-axis xy;
+% subplot(212)
+% imshow(flipud(I),RA);
+% axis xy;
 
 % reference : end point info.
 if strcmp(trace_info{2},'EV')
@@ -179,13 +179,16 @@ end
 % find best fit path
 [k_idx,k_d] = knnsearch([ps.hist_x(:,end),ps.hist_y(:,end)],end_point,'k',1);
 sorted_k = sortrows([k_idx,k_d],2);
-sorted_k(1)
+% sorted_k(1) % nextline changed
+fprintf ( 1, 'found best index : %d\n',sorted_k(1));
 
 % visusalize result
 hold on
-plot(ps.hist_x(sorted_k(1),:),ps.hist_y(sorted_k(1),:));
+est_p = plot(ps.hist_x(sorted_k(1),:),ps.hist_y(sorted_k(1),:),'-.r*');
 text(1,3,['Penalty Score = ',num2str(min(k_d))]);
 hold off
+
+legend(est_p,'Estimated path (Best fit)')
 
 % first time is initial time and it must be added manually,
 % because it's not coundted at step detection
